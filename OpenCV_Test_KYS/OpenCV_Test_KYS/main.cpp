@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
     cout << "OpenCV minor version : " << CV_MINOR_VERSION << endl;
     cout << "OpenCV subminor version : " << CV_SUBMINOR_VERSION << endl;
     
-    Mat Image = imread("test.jpeg");
+    Mat Image = imread(IMAGE_PATH);
     if(Image.empty()){
         cout << "Could not open find the image" << endl;
         return -1;
