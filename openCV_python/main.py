@@ -1,5 +1,6 @@
 import cv2
 
+# 이미지 불러오기 & 이미지 사이즈 조절
 def showImage():
     imgFile = "resource/img.jpg"
 
