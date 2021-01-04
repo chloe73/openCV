@@ -1,11 +1,27 @@
+
 import cv2
 from matplotlib import pyplot as plt
 
 imgFile = "resource/img.jpg" # 파일 위치 저장
-img = cv2.imread(imgFile,0)
+img = cv2.imread(imgFile, 0)
 
-plt.hist(img.ravel(), 256, [0,256]);
+color = ('b','g','r')
+
+for i,col in enumerate(color):
+    histr = cv2.calcHist([img],[i],None,[256],[0,256])
+    plt.plot(histr,color = col)
+    plt.xlim([0,256])
 plt.show()
+
+# =======openCV_histogram 실습 1=============
+# import cv2
+# from matplotlib import pyplot as plt
+#
+# imgFile = "resource/img.jpg" # 파일 위치 저장
+# img = cv2.imread(imgFile,0)
+#
+# plt.hist(img.ravel(), 256, [0,256]);
+# plt.show()
 
 # ======================================================================
 
