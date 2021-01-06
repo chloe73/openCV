@@ -1,5 +1,5 @@
 
-
+# commit
 # ========== 히스토그램 균일화(평활화) : Histogram Equalization ===========
 # import cv2
 # import numpy as np
