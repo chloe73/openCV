@@ -1,20 +1,50 @@
 
-import cv2
-from matplotlib import pyplot as plt
 
-imgFile = "resource/img.jpg" # 파일 위치 저장
-img = cv2.imread(imgFile, 0)
+# ========== 히스토그램 균일화(평활화) : Histogram Equalization ===========
+# import cv2
+# import numpy as np
+# from matplotlib import pyplot as plt
+#
+# imgFile = "resource/111.jpg" # 파일 위치 저장
+# img = cv2.imread(imgFile, 0)
+#
+#
+# hist, bins = np.histogram(img.ravel(), 256,[0,256]) # 히스토그램 구하기
+# cdf = hist.cumsum()  # numpy 배열을 1차원으로 하고 더한 값을 누적하여 배열 생성
+#
+# cdf_m = np.ma.masked_equal(cdf, 0)  # cdf에서 값이 0인 부분을 mask하여 제외 처리
+#
+# cdf_m = (cdf_m - cdf_m.min()) * 255 / (cdf_m.max() - cdf_m.min())  # 여기가 균일화 방정식
+#
+# cdf = np.ma.filled(cdf_m, 0).astype('uint8')  # mask로 제외했던 0값을 복원
+#
+# img2 = cdf[img]
+#
+# cv2.imshow('Equalization', img2)
+#
+# cv2.waitKey(0)
+#
+# cv2.destroyAllWindows()
 
-color = ('b','g','r')
-
-for i,col in enumerate(color):
-    histr = cv2.calcHist([img],[i],None,[256],[0,256])
-    plt.plot(histr,color = col)
-    plt.xlim([0,256])
-plt.show()
+# =========================================================================
+# import numpy as np
+# import cv2
+# from matplotlib import pyplot as plt
+#
+# imgFile = "resource/img.jpg" # 파일 위치 저장
+# img = cv2.imread(imgFile, 0)
+#
+# color = ('b','g','r')
+#
+# for i,col in enumerate(color):
+#     histr = cv2.calcHist([img],[i],None,[256],[0,256])
+#     plt.plot(histr, color=col)
+#     plt.xlim([0,256])
+# plt.show()
 
 # =======openCV_histogram 실습 1=============
 # import cv2
+# import numpy as np
 # from matplotlib import pyplot as plt
 #
 # imgFile = "resource/img.jpg" # 파일 위치 저장
