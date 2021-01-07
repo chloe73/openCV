@@ -12,6 +12,31 @@ plt.imshow(thresh, cmap='gray')
 plt.axis('off')
 plt.show()
 
+kernel = np.ones((3,3),np.uint8)
+opening = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,kernel, iterations = 2)
+
+# 배경이 확실한 영역
+sure_bg = cv2.dilate(opening,kernel,iterations=3)
+
+# 전경이 확실한 영역 찾기
+dist_transform = cv2.distanceTransform(opening,cv2.DIST_L2,5)
+ret, sure_fg = cv2.threshold(dist_transform,0.7*dist_transform.max(),255,0)
+
+# 모르겠는 영역 찾기
+sure_fg = np.uint8(sure_fg)
+unknown = cv2.subtract(sure_bg,sure_fg)
+
+plt.figure(figsize=(12,8))
+plt.subplot(221), plt.imshow(opening,cmap='gray')
+plt.title("Noise Removed"), plt.axis('off')
+plt.subplot(222), plt.imshow(sure_bg,cmap='gray')
+plt.title("Sure Background"), plt.axis('off')
+plt.subplot(223), plt.imshow(dist_transform,cmap='gray')
+plt.title("Distance Transform"), plt.axis('off')
+plt.subplot(224), plt.imshow(sure_fg,cmap='gray')
+plt.title("Threshold"), plt.axis('off')
+plt.show()
+
 
 # commit
 # ========== 히스토그램 균일화(평활화) : Histogram Equalization ===========
