@@ -1,3 +1,17 @@
+# 1/7 computer vision study : segmentation
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
+# imgFile = "resource/coin.png" # 파일 위치 저장
+img = cv2.imread("resource/coin.png")
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+ret, thresh = cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+
+plt.imshow(thresh, cmap='gray')
+plt.axis('off')
+plt.show()
+
 
 # commit
 # ========== 히스토그램 균일화(평활화) : Histogram Equalization ===========
