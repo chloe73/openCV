@@ -1,41 +1,80 @@
-# 1/7 computer vision study : segmentation
+# 1/7 computer vision stduy : labeling
+import sys
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
-# imgFile = "resource/coin.png" # 파일 위치 저장
-img = cv2.imread("resource/coin.png")
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-ret, thresh = cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+img = "resource/keyboard.jpg" # 파일 위치 저장
+# resize_img= cv2.resize(img, (500,500))
+# image =
 
-plt.imshow(thresh, cmap='gray')
-plt.axis('off')
-plt.show()
+src = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
 
-kernel = np.ones((3,3),np.uint8)
-opening = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,kernel, iterations = 2)
+resize_img = cv2.resize(src, (500,500)) # 이미지 크기 조절
 
-# 배경이 확실한 영역
-sure_bg = cv2.dilate(opening,kernel,iterations=3)
+if resize_img is None:
+    print('Image load failed!')
+    sys.exit()
 
-# 전경이 확실한 영역 찾기
-dist_transform = cv2.distanceTransform(opening,cv2.DIST_L2,5)
-ret, sure_fg = cv2.threshold(dist_transform,0.7*dist_transform.max(),255,0)
+_, src_bin = cv2.threshold(resize_img, 0, 255, cv2.THRESH_OTSU)
 
-# 모르겠는 영역 찾기
-sure_fg = np.uint8(sure_fg)
-unknown = cv2.subtract(sure_bg,sure_fg)
+cnt, labels, stats, centroids = cv2.connectedComponentsWithStats(src_bin)
 
-plt.figure(figsize=(12,8))
-plt.subplot(221), plt.imshow(opening,cmap='gray')
-plt.title("Noise Removed"), plt.axis('off')
-plt.subplot(222), plt.imshow(sure_bg,cmap='gray')
-plt.title("Sure Background"), plt.axis('off')
-plt.subplot(223), plt.imshow(dist_transform,cmap='gray')
-plt.title("Distance Transform"), plt.axis('off')
-plt.subplot(224), plt.imshow(sure_fg,cmap='gray')
-plt.title("Threshold"), plt.axis('off')
-plt.show()
+dst = cv2.cvtColor(resize_img, cv2.COLOR_GRAY2BGR)
+
+for i in range(1, cnt): # 각각의 객체 정보에 들어가기 위해 반복문. 범위를 1부터 시작한 이유는 배경을 제외
+    (x, y, w, h, area) = stats[i]
+
+    # 노이즈 제거
+    if area < 20:
+        continue
+
+    cv2.rectangle(dst, (x, y, w, h), (0, 255, 255))
+
+cv2.imshow('src', resize_img)
+cv2.imshow('src_bin', src_bin)
+cv2.imshow('dst', dst)
+cv2.waitKey()
+cv2.destroyAllWindows()
+
+# # 1/7 computer vision study : segmentation
+# import numpy as np
+# import cv2
+# import matplotlib.pyplot as plt
+#
+# # imgFile = "resource/coin.png" # 파일 위치 저장
+# img = cv2.imread("resource/coin.png")
+# gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+# ret, thresh = cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+#
+# plt.imshow(thresh, cmap='gray')
+# plt.axis('off')
+# plt.show()
+# #
+# kernel = np.ones((3,3),np.uint8)
+# opening = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,kernel, iterations = 2)
+#
+# # 배경이 확실한 영역
+# sure_bg = cv2.dilate(opening,kernel,iterations=3)
+#
+# # 전경이 확실한 영역 찾기
+# dist_transform = cv2.distanceTransform(opening,cv2.DIST_L2,5)
+# ret, sure_fg = cv2.threshold(dist_transform,0.7*dist_transform.max(),255,0)
+#
+# # 모르겠는 영역 찾기
+# sure_fg = np.uint8(sure_fg)
+# unknown = cv2.subtract(sure_bg,sure_fg)
+#
+# plt.figure(figsize=(12,8))
+# plt.subplot(221), plt.imshow(opening,cmap='gray')
+# plt.title("Noise Removed"), plt.axis('off')
+# plt.subplot(222), plt.imshow(sure_bg,cmap='gray')
+# plt.title("Sure Background"), plt.axis('off')
+# plt.subplot(223), plt.imshow(dist_transform,cmap='gray')
+# plt.title("Distance Transform"), plt.axis('off')
+# plt.subplot(224), plt.imshow(sure_fg,cmap='gray')
+# plt.title("Threshold"), plt.axis('off')
+# plt.show()
 
 
 # commit
@@ -97,7 +136,7 @@ plt.show()
 # import cv2
 # import numpy as np
 # import matplotlib.pyplot as plt
-
+#
 # import cv2
 #
 # def showImage():
