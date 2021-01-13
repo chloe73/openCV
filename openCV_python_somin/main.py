@@ -1,41 +1,90 @@
-# 1/7 computer vision stduy : labeling
-import sys
-import numpy as np
+# computer vision study : 이미지 변환 - Rotation(2)
 import cv2
-import matplotlib.pyplot as plt
+import imutils
 
-img = "resource/keyboard.jpg" # 파일 위치 저장
-# resize_img= cv2.resize(img, (500,500))
-# image =
+# load the image and show it
+image = cv2.imread("resource/111.jpg")
+cv2.imshow("Original", image)
 
-src = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
-
-resize_img = cv2.resize(src, (500,500)) # 이미지 크기 조절
-
-if resize_img is None:
-    print('Image load failed!')
-    sys.exit()
-
-_, src_bin = cv2.threshold(resize_img, 0, 255, cv2.THRESH_OTSU)
-
-cnt, labels, stats, centroids = cv2.connectedComponentsWithStats(src_bin)
-
-dst = cv2.cvtColor(resize_img, cv2.COLOR_GRAY2BGR)
-
-for i in range(1, cnt): # 각각의 객체 정보에 들어가기 위해 반복문. 범위를 1부터 시작한 이유는 배경을 제외
-    (x, y, w, h, area) = stats[i]
-
-    # 노이즈 제거
-    if area < 20:
-        continue
-
-    cv2.rectangle(dst, (x, y, w, h), (0, 255, 255))
-
-cv2.imshow('src', resize_img)
-cv2.imshow('src_bin', src_bin)
-cv2.imshow('dst', dst)
+# 회전의 중심축을 정의하지 않으면 그림의 중심이 됨
+rotated = imutils.rotate(image, 45)
+cv2.imshow("Rotated by 180 Degrees", rotated)
 cv2.waitKey()
-cv2.destroyAllWindows()
+
+# 회전의 중심 축을 정의하면 해당 중심축으로 회전을 함.
+rotated = imutils.rotate(image, 45, center=(0, 0))  # 회전 중심축 TOP LEFT
+cv2.imshow("Rotated by 180 Degrees", rotated)
+cv2.waitKey()
+
+#  computer vision study : 이미지 변환 - Rotation(1)
+# import cv2
+#
+# # load the image and show it
+# image = cv2.imread("resource/111.jpg")
+# cv2.imshow("Original", image)
+#
+# # grab the dimensions of the image and calculate the center of the image
+# (h, w) = image.shape[:2]
+# (cX, cY) = (w / 2, h / 2)
+#
+# # rotate our image by 45 degrees
+# M = cv2.getRotationMatrix2D((cX, cY), 45, 1.0)
+# rotated = cv2.warpAffine(image, M, (w, h))
+# cv2.imshow("Rotated by 45 Degrees", rotated)
+# cv2.waitKey()
+
+
+# computer vision study : 이미지 변환 - Translation (상하, 좌우 이동)
+# import cv2
+# import imutils
+#
+# image = cv2.imread('resource/111.jpg')
+# # X 방향으로 25, Y 방향으로 50 이동할때
+# shifted = imutils.translate(image, 25, 50)   # translate는 이해하기 쉬운 용어
+#
+# cv2.imshow("Shifted Down and Right", shifted)
+# cv2.waitKey()
+# cv2.destroyAllWindows()
+
+
+# 1/7 computer vision stduy : labeling
+# import sys
+# import numpy as np
+# import cv2
+# import matplotlib.pyplot as plt
+#
+# img = "resource/keyboard.jpg" # 파일 위치 저장
+# # resize_img= cv2.resize(img, (500,500))
+# # image =
+#
+# src = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
+#
+# resize_img = cv2.resize(src, (500,500)) # 이미지 크기 조절
+#
+# if resize_img is None:
+#     print('Image load failed!')
+#     sys.exit()
+#
+# _, src_bin = cv2.threshold(resize_img, 0, 255, cv2.THRESH_OTSU)
+#
+# cnt, labels, stats, centroids = cv2.connectedComponentsWithStats(src_bin)
+#
+# dst = cv2.cvtColor(resize_img, cv2.COLOR_GRAY2BGR)
+#
+# for i in range(1, cnt): # 각각의 객체 정보에 들어가기 위해 반복문. 범위를 1부터 시작한 이유는 배경을 제외
+#     (x, y, w, h, area) = stats[i]
+#
+#     # 노이즈 제거
+#     if area < 20:
+#         continue
+#
+#     cv2.rectangle(dst, (x, y, w, h), (0, 255, 255))
+#
+# cv2.imshow('src', resize_img)
+# cv2.imshow('src_bin', src_bin)
+# cv2.imshow('dst', dst)
+# cv2.waitKey()
+# cv2.destroyAllWindows()
 
 # # 1/7 computer vision study : segmentation
 # import numpy as np
