@@ -1,20 +1,130 @@
-# computer vision study : 이미지 변환 - Rotation(2)
+# computer vision stduy : 이미지 뒤틀기(원근 변환 (perspective.py))
 import cv2
-import imutils
+import numpy as np
 
-# load the image and show it
-image = cv2.imread("resource/111.jpg")
-cv2.imshow("Original", image)
+file_name = "resource/111.jpg"
+img = cv2.imread(file_name)
+rows, cols = img.shape[:2]
 
-# 회전의 중심축을 정의하지 않으면 그림의 중심이 됨
-rotated = imutils.rotate(image, 45)
-cv2.imshow("Rotated by 180 Degrees", rotated)
-cv2.waitKey()
+#---① 원근 변환 전 후 4개 좌표
+pts1 = np.float32([[0,0], [0,rows], [cols, 0], [cols,rows]])
+pts2 = np.float32([[100,50], [10,rows-50], [cols-100, 50], [cols-10,rows-50]])
 
-# 회전의 중심 축을 정의하면 해당 중심축으로 회전을 함.
-rotated = imutils.rotate(image, 45, center=(0, 0))  # 회전 중심축 TOP LEFT
-cv2.imshow("Rotated by 180 Degrees", rotated)
-cv2.waitKey()
+#---② 변환 전 좌표를 원본 이미지에 표시
+cv2.circle(img, (0,0), 10, (255,0,0), -1)
+cv2.circle(img, (0,rows), 10, (0,255,0), -1)
+cv2.circle(img, (cols,0), 10, (0,0,255), -1)
+cv2.circle(img, (cols,rows), 10, (0,255,255), -1)
+
+#---③ 원근 변환 행렬 계산
+mtrx = cv2.getPerspectiveTransform(pts1, pts2)
+#---④ 원근 변환 적용
+dst = cv2.warpPerspective(img, mtrx, (cols, rows))
+
+cv2.imshow("origin", img)
+cv2.imshow('perspective', dst)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+# computer vision stduy : 이미지 뒤틀기(어핀 변환 (getAffine.py))
+# import cv2
+# import numpy as np
+# from matplotlib import pyplot as plt
+#
+# file_name = 'resource/111.jpg'
+# img = cv2.imread(file_name)
+# rows, cols = img.shape[:2]
+#
+# # ---① 변환 전, 후 각 3개의 좌표 생성
+# pts1 = np.float32([[200, 100], [400, 100], [200, 400]])
+# pts2 = np.float32([[160, 140], [420, 120], [500, 240]])
+#
+# # ---② 변환 전 좌표를 이미지에 표시
+# cv2.circle(img, (200,100), 5, (255,0), -1)
+# cv2.circle(img, (400,100), 5, (0,255,0), -1)
+# cv2.circle(img, (200,400), 5, (0,0,255), -1)
+#
+# #---③ 짝지은 3개의 좌표로 변환 행렬 계산
+# mtrx = cv2.getAffineTransform(pts1, pts2)
+# #---④ 어핀 변환 적용
+# dst = cv2.warpAffine(img, mtrx, (int(cols*1.5), rows))
+#
+# #---⑤ 결과 출력
+# cv2.imshow('origin',img)
+# cv2.imshow('affin', dst)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
+
+
+# computer vision study : 이미지 변환 - Flipping(이미지 뒤집기)
+# import cv2
+#
+# image = cv2.imread("resource/111.jpg")
+# cv2.imshow("Original", image)
+#
+# # X축 뒤집기
+# flipped = cv2.flip(image, 0)
+# cv2.imshow("X axis", flipped)
+#
+# # Y축 뒤집기
+# flipped = cv2.flip(image, 1)
+# cv2.imshow("Y axis", flipped)
+#
+# # X, Y축 동시
+# flipped = cv2.flip(image, -1)
+# cv2.imshow("Both Flipped", flipped)
+#
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
+
+
+# computer vision stduy : 이미지 변환 - Scaling - Resize
+# import cv2
+#
+# image = cv2.imread("resource/111.jpg")
+# img_scale = cv2.resize(image, (300, 200), interpolation = cv2.INTER_AREA)
+# cv2.imshow('Scaling Size', img_scale)
+# cv2.waitKey()
+# cv2.destroyAllWindows()
+
+
+# computer vision stduy : 이미지 변환 - Scaling - Cubic Interpolation
+# import cv2
+#
+# image = cv2.imread("resource/111.jpg")
+# img_scale = cv2.resize(image, None, fx=0.8, fy=1, interpolation = cv2.INTER_CUBIC)
+# cv2.imshow('CUBIC Interpolation', img_scale)
+# cv2.waitKey()
+# cv2.destroyAllWindows()
+
+# computer vision stduy : 이미지 변환 - Scaling - Linear Interpolation(선형 보간법)
+# import cv2
+#
+# image = cv2.imread("resource/111.jpg")
+# img_scale = cv2.resize(image, None, fx=0.8, fy=1, interpolation = cv2.INTER_LINEAR)
+# cv2.imshow('Linear Interpolation', img_scale)
+# cv2.waitKey()
+# cv2.destroyAllWindows()
+
+
+# computer vision study : 이미지 변환 - Rotation(2)
+# import cv2
+# import imutils
+#
+# # load the image and show it
+# image = cv2.imread("resource/111.jpg")
+# cv2.imshow("Original", image)
+#
+# # 회전의 중심축을 정의하지 않으면 그림의 중심이 됨
+# rotated = imutils.rotate(image, 45)
+# cv2.imshow("Rotated by 180 Degrees", rotated)
+# cv2.waitKey()
+#
+# # 회전의 중심 축을 정의하면 해당 중심축으로 회전을 함.
+# rotated = imutils.rotate(image, 45, center=(0, 0))  # 회전 중심축 TOP LEFT
+# cv2.imshow("Rotated by 180 Degrees", rotated)
+# cv2.waitKey()
 
 #  computer vision study : 이미지 변환 - Rotation(1)
 # import cv2
