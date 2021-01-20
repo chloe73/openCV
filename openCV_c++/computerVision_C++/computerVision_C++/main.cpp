@@ -1,3 +1,4 @@
+// =============================================키보드 라벨링==================================
 #include <opencv2/core/core.hpp> 
 #include <opencv2/highgui/highgui.hpp> 
 #include <opencv2/imgproc/imgproc.hpp>
@@ -7,15 +8,49 @@
 using namespace cv;
 using namespace std;
 
+void labeling_stats()
+{
+
+	Mat src = imread("dddd.png", IMREAD_GRAYSCALE);
+	resize(src, src, Size(500, 400));
+
+	if (src.empty()) {
+		cerr << "image load error" << endl;
+		return;
+	}
+
+	Mat bin;
+	threshold(src, bin, 0, 255, THRESH_BINARY | THRESH_OTSU);
+
+	Mat labels, stats, centroid;
+	int cnt = connectedComponentsWithStats(bin, labels, stats, centroid);
+
+	Mat dst;
+	cvtColor(src, dst, COLOR_GRAY2BGR);
+
+	for (int i = 1; i < cnt; ++i) {
+		int* label = stats.ptr<int>(i);
+
+		if (label[4] < 20) continue;
+		rectangle(dst, Rect(label[0], label[1], label[2], label[3]), Scalar(0, 255, 255));
+	}
+
+	imshow("src", src);
+	imshow("dst", dst);
+
+	waitKey();
+	destroyAllWindows();
+}
+
 int main()
 {
 	Mat image = imread("keyboard.jpg", 0);
 	if (!image.data)
 		return 0;
 
-	resize(image, image, Size(), 0.6, 0.6);
-	namedWindow("original image");
-	imshow("original image", image);
+	resize(image, image, Size(500, 400));
+	//namedWindow("original image"); 
+	//imshow("original image", image); 
 
 	// 고정된 경계 값 사용 
 	Mat binaryFixed;
@@ -28,8 +63,8 @@ int main()
 	각 화소의 이웃으로 계산하는 지역 경계화를 사용
 	즉, 적응적 경계화(Adaptive Threshold)를 적용
 	*/
-	cv::namedWindow("Fixed Threshold");
-	cv::imshow("Fixed Threshold", binaryFixed);
+	//cv::namedWindow("Fixed Threshold"); 
+	//cv::imshow("Fixed Threshold", binaryFixed); 
 
 
 	/* 적분 영상 계산
@@ -56,7 +91,8 @@ int main()
 	int nl = binary.rows; // number of lines 
 	int nc = binary.cols; // total number of elements per line 
 
-	Mat iimage; integral(image, iimage, CV_32S);
+	Mat iimage;
+	integral(image, iimage, CV_32S);
 	/*
 	모든 화소를 순회하면서 정방형 이웃의 평균을 계산
 	포인터를 이용하여 영상을 순회
@@ -81,8 +117,8 @@ int main()
 				data[i] = 255;
 		}
 	}
-	cv::namedWindow("Adaptive Threshold (integral)");
-	cv::imshow("Adaptive Threshold (integral)", binary);
+	//cv::namedWindow("Adaptive Threshold (integral)"); 
+	//cv::imshow("Adaptive Threshold (integral)", binary); 
 
 
 	/* 영상 연산자를 이용하여 적응적 경계화 */
@@ -95,10 +131,116 @@ int main()
 	namedWindow("Adaptive Threshold (filtered)");
 	imshow("Adaptive Threshold (filtered)", binaryFiltered);
 
+	labeling_stats();
+
 	waitKey(0);
 	return 0;
 
 }
+
+
+// ========================================adaptive thresholding 실습==============================
+//#include <opencv2/core/core.hpp> 
+//#include <opencv2/highgui/highgui.hpp> 
+//#include <opencv2/imgproc/imgproc.hpp>
+//
+//#include <iostream>
+//
+//using namespace cv;
+//using namespace std;
+//
+//int main()
+//{
+//	Mat image = imread("keyboard.jpg", 0);
+//	if (!image.data)
+//		return 0;
+//
+//	resize(image, image, Size(), 0.6, 0.6);
+//	namedWindow("original image");
+//	imshow("original image", image);
+//
+//	// 고정된 경계 값 사용 
+//	Mat binaryFixed;
+//	Mat binaryAdaptive;
+//	threshold(image, binaryFixed, 160, 255, THRESH_BINARY);
+//
+//	/*
+//	영상의 일부에서 텍스트가 누락되는 현상을 보임
+//	이러한 문제를 극복하기 위해서
+//	각 화소의 이웃으로 계산하는 지역 경계화를 사용
+//	즉, 적응적 경계화(Adaptive Threshold)를 적용
+//	*/
+//	cv::namedWindow("Fixed Threshold");
+//	cv::imshow("Fixed Threshold", binaryFixed);
+//
+//
+//	/* 적분 영상 계산
+//	모든 화소를 순회하면서 정방형 이웃의 평균을 계산
+//	*/
+//
+//	/* 함수를 이용하여 적응적 경계화 */
+//	int blockSize = 21; // 이웃 크기 
+//	int threshold = 10; //화소를 (평균-경계 값)과 비교 
+//
+//	adaptiveThreshold(image, // 입력영상 
+//		binaryAdaptive, // 이진화 결과 영상 
+//		255, // 최대 화소 값 
+//		ADAPTIVE_THRESH_MEAN_C, // Adaptive 함수 
+//		THRESH_BINARY, // 이진화 타입 
+//		blockSize, // 이웃크기 
+//		threshold); // threshold used 
+//
+//	cv::namedWindow("Adaptive Threshold");
+//	cv::imshow("Adaptive Threshold", binaryAdaptive);
+//
+//	/* 함수를 이용하지 않고 직접 구현 */
+//	Mat binary = image.clone();
+//	int nl = binary.rows; // number of lines 
+//	int nc = binary.cols; // total number of elements per line 
+//
+//	Mat iimage; integral(image, iimage, CV_32S);
+//	/*
+//	모든 화소를 순회하면서 정방형 이웃의 평균을 계산
+//	포인터를 이용하여 영상을 순회
+//	*/
+//	int halfSize = blockSize / 2;
+//	for (int j = halfSize; j < nl - halfSize - 1; j++) {
+//
+//		// j행의 주소 얻기 
+//		uchar* data = binary.ptr<uchar>(j);
+//		int* idata1 = iimage.ptr<int>(j - halfSize);
+//		int* idata2 = iimage.ptr<int>(j + halfSize + 1);
+//
+//		// 행의 각 화소 
+//		for (int i = halfSize; i < nc - halfSize - 1; i++) {
+//
+//			// 합 계산 
+//			int sum = (idata2[i + halfSize + 1] - idata2[i - halfSize] - idata1[i + halfSize + 1] + idata1[i - halfSize]) / (blockSize * blockSize);
+//			// 적응적 경계화 적용 
+//			if (data[i] < (sum - threshold))
+//				data[i] = 0;
+//			else
+//				data[i] = 255;
+//		}
+//	}
+//	cv::namedWindow("Adaptive Threshold (integral)");
+//	cv::imshow("Adaptive Threshold (integral)", binary);
+//
+//
+//	/* 영상 연산자를 이용하여 적응적 경계화 */
+//	Mat filtered;
+//	Mat binaryFiltered;
+//	boxFilter(image, filtered, CV_8U, Size(blockSize, blockSize));
+//	filtered = filtered - threshold;
+//	binaryFiltered = image >= filtered;
+//
+//	namedWindow("Adaptive Threshold (filtered)");
+//	imshow("Adaptive Threshold (filtered)", binaryFiltered);
+//
+//	waitKey(0);
+//	return 0;
+//
+//}
 
 // Basic Method
 //#include <opencv2/opencv.hpp> 
