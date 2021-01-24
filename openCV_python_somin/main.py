@@ -1,3 +1,47 @@
+#
+import numpy as np
+import cv2
+
+im = cv2.imread("resource/QRImage.png")
+row, col = im.shape[:2]
+bottom = im[row-2:row, 0:col]
+mean = cv2.mean(bottom)[0]
+
+bordersize = 10
+border = cv2.copyMakeBorder(
+    im,
+    top=bordersize,
+    bottom=bordersize,
+    left=bordersize,
+    right=bordersize,
+    borderType=cv2.BORDER_CONSTANT,
+    value=[mean, 1, mean]
+)
+
+# cv2.imshow('image', im)
+# cv2.imshow('bottom', bottom)
+cv2.imshow('border', border)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# computer vision study : qr코드 인식 (여러 각도에서 찍은 qr 인식)
+# import cv2
+# import numpy as np
+#
+# inputImage = cv2.imread("resource/QRImage.png")
+# inputImage = cv2.resize(inputImage, None, fx=0.2, fy=0.2, interpolation=cv2.INTER_AREA)
+#
+# qrDecoder = cv2.QRCodeDetector()
+#
+# # QR코드를 찾고 디코드해줍니다
+# data, bbox, rectifiedImage = qrDecoder.detectAndDecode(inputImage)
+# if len(data) > 0:
+#     print("Decoded Data : {}".format(data))
+#     rectifiedImage = np.uint8(rectifiedImage)
+#
+# else:
+#     print("QR Code not detected")
+
 # computer vision stduy : 이미지 뒤틀기(원근 변환 (perspective.py))
 # import cv2
 # import numpy as np
@@ -163,7 +207,7 @@
 # import cv2
 # import matplotlib.pyplot as plt
 #
-# img = "resource/keyboard.jpg" # 파일 위치 저장
+# img = "resource/QRImage.png" # 파일 위치 저장
 # # resize_img= cv2.resize(img, (500,500))
 # # image =
 #
