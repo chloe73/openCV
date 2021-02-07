@@ -1,3 +1,152 @@
+# MNIST - 학습시킨 데이터로 테스트하기
+import pickle
+import sys
+import matplotlib.pylab as plt
+from dataset.dataset.mnist import load_mnist
+
+sys.path.append("./dataset") # 이때, dataset 폴더는 실행하는 py 파일의 경로와 일치해야 한다.
+(train_image_data, train_label_data), (test_image_data, test_label_data) = load_mnist(flatten = True, normalize = False)
+
+
+def sigmoid(x):  # sigmoid 함수
+    return 1 / (1 + plt.np.exp(-x))
+
+
+def softmax(matrix):  # softmax 함수
+    maximum_of_matrix = plt.np.max(matrix)
+    difference_from_maximum = matrix - maximum_of_matrix
+    exponential_of_difference = plt.np.exp(difference_from_maximum)
+    sum_of_exponential = plt.np.sum(exponential_of_difference)
+    y = exponential_of_difference / sum_of_exponential
+    return y
+
+
+def get_data():  # mnist 데이터를 불러옴. 여기서는 이 중에 test 변수만을 사용할 것이다.
+    (image_train, label_train), (image_test, label_test) = load_mnist(flatten=True, normalize=False)
+    return image_test, label_test
+
+
+def init_network():  # sample_weight 를 불러와서 신경망 구성
+    with open('./dataset/sample_weight.pkl', 'rb') as f:
+        network = pickle.load(f)
+    return network
+
+
+def predict(network, x):  # 테스트 케이스들을 테스트
+    # hidden data 2개
+    W1, W2, W3 = network['W1'], network['W2'], network['W3']
+    b1, b2, b3 = network['b1'], network['b2'], network['b3']
+    a1 = plt.np.dot(x, W1) + b1
+    z1 = sigmoid(a1)
+    a2 = plt.np.dot(z1, W2) + b2
+    z2 = sigmoid(a2)
+    a3 = plt.np.dot(z2, W3) + b3
+    y = softmax(a3)
+
+    return y
+
+
+images, labels = get_data()
+network = init_network()
+
+accuracy_cnt = 0
+for i in range(len(images)):  # 각 테스트 케이스들에 대해
+    y = predict(network, images[i])  # 실행 결과 output 10개가 나온다
+    # 각 0~9 별로 비슷 정도에 대한 수치이다
+    p = plt.np.argmax(y)  # 가장 가능성이 높은(값이 큰) 것을 선택
+    if p == labels[i]:  # 실제 값과 비교하여, 예측과 실제가 맞으면 카운트
+        accuracy_cnt += 1
+
+print("Accuracy: " + str(float(accuracy_cnt) / len(images)))
+
+# MNIST 데이터 가져오기
+# import sys
+#
+# from dataset.dataset.mnist import load_mnist
+#
+# sys.path.append("./dataset") # 이때, dataset 폴더는 실행하는 py 파일의 경로와 일치해야 한다.
+#
+# (train_image_data, train_label_data), (test_image_data, test_label_data) = load_mnist(flatten = True, normalize = False)
+#
+# import matplotlib.pylab as plt
+#
+# # n(0~59,999)을 입력값으로 주면, 그 번호에 맞는 label과 image를 가져와서, 그걸 그림으로 나타내는 함수이다.
+# def mnist_show(n) :
+#     image = train_image_data[n]
+#     image_reshaped = image.reshape(28, 28)
+#     image_reshaped.shape
+#     label = train_label_data[n]
+#     plt.figure(figsize = (4, 4))
+#     plt.title("sample of " + str(label))
+#     plt.imshow(image_reshaped, cmap="gray")
+#     plt.show()
+#
+# mnist_show(2747)
+
+# 텐서플로우 테스트 코드
+# import tensorflow as tf
+# mnist = tf.keras.datasets.mnist
+#
+# (x_train, y_train),(x_test, y_test) = mnist.load_data()
+# x_train, x_test = x_train / 255.0, x_test / 255.0
+#
+# model = tf.keras.models.Sequential([
+#   tf.keras.layers.Flatten(input_shape=(28, 28)),
+#   tf.keras.layers.Dense(128, activation='relu'),
+#   tf.keras.layers.Dropout(0.2),
+#   tf.keras.layers.Dense(10, activation='softmax')
+# ])
+#
+# model.compile(optimizer='adam',
+#               loss='sparse_categorical_crossentropy',
+#               metrics=['accuracy'])
+#
+# model.fit(x_train, y_train, epochs=5)
+# model.evaluate(x_test, y_test)
+
+# ==============
+# import cv2
+#
+# im = cv2.imread("resource/QRImage.png")
+# row, col = im.shape[:2]
+# bottom = im[row-2:row, 0:col]
+# mean = cv2.mean(bottom)[0]
+#
+# bordersize = 10 # 이미지 테두리 크기
+# border = cv2.copyMakeBorder(
+#     im,
+#     top=bordersize,
+#     bottom=bordersize,
+#     left=bordersize,
+#     right=bordersize,
+#     borderType=cv2.BORDER_CONSTANT,
+#     value=[mean, 1, mean]
+# )
+#
+# # cv2.imshow('image', im)
+# # cv2.imshow('bottom', bottom)
+# cv2.imshow('border', border)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
+
+# computer vision study : qr코드 인식 (여러 각도에서 찍은 qr 인식)
+# import cv2
+# import numpy as np
+#
+# inputImage = cv2.imread("resource/QRImage.png")
+# inputImage = cv2.resize(inputImage, None, fx=0.2, fy=0.2, interpolation=cv2.INTER_AREA)
+#
+# qrDecoder = cv2.QRCodeDetector()
+#
+# # QR코드를 찾고 디코드해줍니다
+# data, bbox, rectifiedImage = qrDecoder.detectAndDecode(inputImage)
+# if len(data) > 0:
+#     print("Decoded Data : {}".format(data))
+#     rectifiedImage = np.uint8(rectifiedImage)
+#
+# else:
+#     print("QR Code not detected")
+
 # computer vision stduy : 이미지 뒤틀기(원근 변환 (perspective.py))
 # import cv2
 # import numpy as np
@@ -163,7 +312,7 @@
 # import cv2
 # import matplotlib.pyplot as plt
 #
-# img = "resource/keyboard.jpg" # 파일 위치 저장
+# img = "resource/QRImage.png" # 파일 위치 저장
 # # resize_img= cv2.resize(img, (500,500))
 # # image =
 #
