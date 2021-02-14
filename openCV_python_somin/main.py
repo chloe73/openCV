@@ -1,63 +1,122 @@
+# 숫자인식
+
+import tensorflow as tf
+
+import matplotlib.pyplot as plt
+
+from PIL import Image
+
+mnist = tf.keras.datasets.mnist
+# "resource/111.jpg"
+import cv2
+
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+x_train, x_test = x_train / 255.0, x_test / 255.0
+
+model = tf.keras.models.Sequential([
+
+    tf.keras.layers.Flatten(),
+
+    tf.keras.layers.Dense(512, activation=tf.nn.relu),
+
+    tf.keras.layers.Dropout(0.2),
+
+    tf.keras.layers.Dense(10, activation=tf.nn.softmax)
+
+])
+
+model.compile(optimizer='adam',
+
+              loss='sparse_categorical_crossentropy',
+
+              metrics=['accuracy'])
+
+model.fit(x_train, y_train, epochs=5)
+
+score = model.evaluate(x_test, y_test)
+
+# 이미지 불러와 출력
+
+gray = cv2.imread("resource/number3.png", cv2.IMREAD_GRAYSCALE)
+
+plt.imshow(gray)
+
+plt.show()
+
+# 이미지 사이즈 변경
+
+gray = cv2.resize(255 - gray, (28, 28))
+
+test_num = gray.flatten() / 255.0
+
+test_num = test_num.reshape((-1, 28, 28, 1))
+
+# 이미지 숫자 테스트
+
+print('The Answer is ', model.predict_classes(test_num))
+
+
 # MNIST - 학습시킨 데이터로 테스트하기
-import pickle
-import sys
-import matplotlib.pylab as plt
-from dataset.dataset.mnist import load_mnist
-
-sys.path.append("./dataset") # 이때, dataset 폴더는 실행하는 py 파일의 경로와 일치해야 한다.
-(train_image_data, train_label_data), (test_image_data, test_label_data) = load_mnist(flatten = True, normalize = False)
-
-
-def sigmoid(x):  # sigmoid 함수
-    return 1 / (1 + plt.np.exp(-x))
-
-
-def softmax(matrix):  # softmax 함수
-    maximum_of_matrix = plt.np.max(matrix)
-    difference_from_maximum = matrix - maximum_of_matrix
-    exponential_of_difference = plt.np.exp(difference_from_maximum)
-    sum_of_exponential = plt.np.sum(exponential_of_difference)
-    y = exponential_of_difference / sum_of_exponential
-    return y
-
-
-def get_data():  # mnist 데이터를 불러옴. 여기서는 이 중에 test 변수만을 사용할 것이다.
-    (image_train, label_train), (image_test, label_test) = load_mnist(flatten=True, normalize=False)
-    return image_test, label_test
-
-
-def init_network():  # sample_weight 를 불러와서 신경망 구성
-    with open('./dataset/sample_weight.pkl', 'rb') as f:
-        network = pickle.load(f)
-    return network
-
-
-def predict(network, x):  # 테스트 케이스들을 테스트
-    # hidden data 2개
-    W1, W2, W3 = network['W1'], network['W2'], network['W3']
-    b1, b2, b3 = network['b1'], network['b2'], network['b3']
-    a1 = plt.np.dot(x, W1) + b1
-    z1 = sigmoid(a1)
-    a2 = plt.np.dot(z1, W2) + b2
-    z2 = sigmoid(a2)
-    a3 = plt.np.dot(z2, W3) + b3
-    y = softmax(a3)
-
-    return y
-
-
-images, labels = get_data()
-network = init_network()
-
-accuracy_cnt = 0
-for i in range(len(images)):  # 각 테스트 케이스들에 대해
-    y = predict(network, images[i])  # 실행 결과 output 10개가 나온다
-    # 각 0~9 별로 비슷 정도에 대한 수치이다
-    p = plt.np.argmax(y)  # 가장 가능성이 높은(값이 큰) 것을 선택
-    if p == labels[i]:  # 실제 값과 비교하여, 예측과 실제가 맞으면 카운트
-        accuracy_cnt += 1
-
-print("Accuracy: " + str(float(accuracy_cnt) / len(images)))
+# import pickle
+# import sys
+# import matplotlib.pylab as plt
+# from dataset.dataset.mnist import load_mnist
+#
+# sys.path.append("./dataset") # 이때, dataset 폴더는 실행하는 py 파일의 경로와 일치해야 한다.
+# (train_image_data, train_label_data), (test_image_data, test_label_data) = load_mnist(flatten = True, normalize = False)
+#
+#
+# def sigmoid(x):  # sigmoid 함수
+#     return 1 / (1 + plt.np.exp(-x))
+#
+#
+# def softmax(matrix):  # softmax 함수
+#     maximum_of_matrix = plt.np.max(matrix)
+#     difference_from_maximum = matrix - maximum_of_matrix
+#     exponential_of_difference = plt.np.exp(difference_from_maximum)
+#     sum_of_exponential = plt.np.sum(exponential_of_difference)
+#     y = exponential_of_difference / sum_of_exponential
+#     return y
+#
+#
+# def get_data():  # mnist 데이터를 불러옴. 여기서는 이 중에 test 변수만을 사용할 것이다.
+#     (image_train, label_train), (image_test, label_test) = load_mnist(flatten=True, normalize=False)
+#     return image_test, label_test
+#
+#
+# def init_network():  # sample_weight 를 불러와서 신경망 구성
+#     with open('./dataset/sample_weight.pkl', 'rb') as f:
+#         network = pickle.load(f)
+#     return network
+#
+#
+# def predict(network, x):  # 테스트 케이스들을 테스트
+#     # hidden data 2개
+#     W1, W2, W3 = network['W1'], network['W2'], network['W3']
+#     b1, b2, b3 = network['b1'], network['b2'], network['b3']
+#     a1 = plt.np.dot(x, W1) + b1
+#     z1 = sigmoid(a1)
+#     a2 = plt.np.dot(z1, W2) + b2
+#     z2 = sigmoid(a2)
+#     a3 = plt.np.dot(z2, W3) + b3
+#     y = softmax(a3)
+#
+#     return y
+#
+#
+# images, labels = get_data()
+# network = init_network()
+#
+# accuracy_cnt = 0
+# for i in range(len(images)):  # 각 테스트 케이스들에 대해
+#     y = predict(network, images[i])  # 실행 결과 output 10개가 나온다
+#     # 각 0~9 별로 비슷 정도에 대한 수치이다
+#     p = plt.np.argmax(y)  # 가장 가능성이 높은(값이 큰) 것을 선택
+#     if p == labels[i]:  # 실제 값과 비교하여, 예측과 실제가 맞으면 카운트
+#         accuracy_cnt += 1
+#
+# print("Accuracy: " + str(float(accuracy_cnt) / len(images)))
 
 # MNIST 데이터 가져오기
 # import sys
